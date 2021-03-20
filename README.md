@@ -18,13 +18,19 @@ how many nodes have been expanded during the search.
 
 ## Comparison of expanded nodes between BBS and BBES
 
+In this comparative table you can see the number of expanded nodes obtained using the BBS and BBES techniques.
+Therefore, we can say that the paths chosen by both search algorithms are the same, except that the number of expanded
+nodes obtained by the branch and bound with underestimation are the smallest. This is because the second algorithm is
+an informed graph search while the other one does not know any information about destination.
+<br>
+
 BB Search | BBE Search
 ------|-------
-n1 | n2
-n2 | n3
-n4 | n5
-n6 | n7
-n8 | n9
+28 | 23
+20 | 18
+36 | 30
+9 | 4
+28 | 21
 
 ## Authors
 

@@ -7,8 +7,6 @@ functions."""
 
 from utils import *
 import random
-import sys
-
 
 # ______________________________________________________________________________
 
@@ -83,6 +81,16 @@ class Node:
             x = x.parent
         return result
 
+    def cost_path(self):
+        """Return total cost from the root to this node"""
+        nodes = self.path()
+        total_cost = 0
+
+        for node in nodes:
+            total_cost += node.path_cost
+
+        return total_cost
+
     def expand(self, problem):
         """Return a list of nodes reachable from this node. [Fig. 3.8]"""
         return [Node(next, self, act,
@@ -91,37 +99,46 @@ class Node:
 
 
 # ______________________________________________________________________________
-## Uninformed Search algorithms
+# Uninformed Search algorithms
 
 def graph_search(problem, fringe):
     """Search through the successors of a problem to find a goal.
     The argument fringe should be an empty queue.
     If two paths reach a state, only use the best one. [Fig. 3.18]"""
-    closed = {}
+    closed, count_expanded_nodes = {}, 0
     fringe.append(Node(problem.initial))
+
     while fringe:
         node = fringe.pop()
+
         if problem.goal_test(node.state):
-            return node
+            return node, count_expanded_nodes
+
         if node.state not in closed:
             closed[node.state] = True
-            fringe.extend(node.expand(problem))
-    return None
+            expanded_nodes = node.expand(problem)
+            count_expanded_nodes += len(expanded_nodes)
+
+            fringe.extend(expanded_nodes)
+
+    return None, count_expanded_nodes
 
 
 def breadth_first_graph_search(problem):
     """Search the shallowest nodes in the search tree first. [p 74]"""
     return graph_search(problem, FIFOQueue())  # FIFOQueue -> fringe
 
-
 def depth_first_graph_search(problem):
     """Search the deepest nodes in the search tree first. [p 74]"""
     return graph_search(problem, Stack())
 
 def branch_and_bound_graph_search(problem):
+    """Search the cheapest nodes in the search tree first. [p 74]"""
     return graph_search(problem, BranchAndBoundList())
 
-
+def branch_and_bound_with_underestimation_graph_search(problem):
+    """Search the cheapest nodes in the search tree first using underestimation. [p 74]"""
+    return graph_search(problem, BranchAndBoundWithUnderestimationList(problem))
 
 # _____________________________________________________________________________
 # The remainder of this file implements examples for the search algorithms.
@@ -195,10 +212,12 @@ def RandomGraph(nodes=list(range(10)), min_links=2, width=400, height=300,
     where curvature() defaults to a random number between 1.1 and 1.5."""
     g = UndirectedGraph()
     g.locations = {}
-    ## Build the cities
+
+    # Build the cities
     for node in nodes:
         g.locations[node] = (random.randrange(width), random.randrange(height))
-    ## Build roads from each city to at least min_links nearest neighbors.
+
+    # Build roads from each city to at least min_links nearest neighbors.
     for i in range(min_links):
         for node in nodes:
             if len(g.get(node)) < min_links:
@@ -211,38 +230,52 @@ def RandomGraph(nodes=list(range(10)), min_links=2, width=400, height=300,
                 neighbor = argmin(nodes, distance_to_node)
                 d = distance(g.locations[neighbor], here) * curvature()
                 g.connect(node, neighbor, int(d))
+
     return g
 
+# ______________________________________________________________________________
+# Examples of instances for graphs problems
 
-romania = UndirectedGraph(Dict(
-    A=Dict(Z=75, S=140, T=118),
-    B=Dict(U=85, P=101, G=90, F=211),
-    C=Dict(D=120, R=146, P=138),
-    D=Dict(M=75),
-    E=Dict(H=86),
-    F=Dict(S=99),
-    H=Dict(U=98),
-    I=Dict(V=92, N=87),
-    L=Dict(T=111, M=70),
-    O=Dict(Z=71, S=151),
-    P=Dict(R=97),
-    R=Dict(S=80),
-    U=Dict(V=142)))
+
+romania = UndirectedGraph(
+    Dict(
+        A=Dict(Z=75, S=140, T=118),
+        B=Dict(U=85, P=101, G=90, F=211),
+        C=Dict(D=120, R=146, P=138),
+        D=Dict(M=75),
+        E=Dict(H=86),
+        F=Dict(S=99),
+        H=Dict(U=98),
+        I=Dict(V=92, N=87),
+        L=Dict(T=111, M=70),
+        O=Dict(Z=71, S=151),
+        P=Dict(R=97),
+        R=Dict(S=80),
+        U=Dict(V=142)
+    )
+)
+
 romania.locations = Dict(
     A=(91, 492), B=(400, 327), C=(253, 288), D=(165, 299),
     E=(562, 293), F=(305, 449), G=(375, 270), H=(534, 350),
     I=(473, 506), L=(165, 379), M=(168, 339), N=(406, 537),
     O=(131, 571), P=(320, 368), R=(233, 410), S=(207, 457),
-    T=(94, 410), U=(456, 350), V=(509, 444), Z=(108, 531))
+    T=(94, 410), U=(456, 350), V=(509, 444), Z=(108, 531)
+)
 
-australia = UndirectedGraph(Dict(
-    T=Dict(),
-    SA=Dict(WA=1, NT=1, Q=1, NSW=1, V=1),
-    NT=Dict(WA=1, Q=1),
-    NSW=Dict(Q=1, V=1)))
-australia.locations = Dict(WA=(120, 24), NT=(135, 20), SA=(135, 30),
-                           Q=(145, 20), NSW=(145, 32), T=(145, 42), V=(145, 37))
+australia = UndirectedGraph(
+    Dict(
+        T=Dict(),
+        SA=Dict(WA=1, NT=1, Q=1, NSW=1, V=1),
+        NT=Dict(WA=1, Q=1),
+        NSW=Dict(Q=1, V=1)
+    )
+)
 
+australia.locations = Dict(
+    WA=(120, 24), NT=(135, 20), SA=(135, 30),
+    Q=(145, 20), NSW=(145, 32), T=(145, 42), V=(145, 37)
+)
 
 class GPSProblem(Problem):
     """The problem of searching in a graph from one node to another."""

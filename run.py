@@ -1,13 +1,42 @@
 # Search methods
 
 import search
+import csv
 
-ab = search.GPSProblem('A', 'B'
-                       , search.romania)
 
-print(search.breadth_first_graph_search(ab).path())
-print(search.depth_first_graph_search(ab).path())
+if __name__ == '__main__':
+    ways = [
+        ('A', 'B'),
+        ('L', 'P'),
+        ('R', 'H'),
+        ('S', 'A'),
+        ('C', 'G')
+    ]
 
-# Result:
-# [<Node B>, <Node P>, <Node R>, <Node S>, <Node A>] : 101 + 97 + 80 + 140 = 418
-# [<Node B>, <Node F>, <Node S>, <Node A>] : 211 + 99 + 140 = 450
+    with open('bbs_bbes.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Expanded Nodes'])
+        writer.writerow(['BBS', 'BBES'])
+
+        for way_case in ways:
+            orig_node, goal_node = way_case
+            problem = search.GPSProblem(orig_node, goal_node, search.romania)
+
+            print('******************************** Way(', orig_node, ', ', goal_node, ')', sep='')
+
+            # bfs_node, num_bfs = search.breadth_first_graph_search(problem)
+            # dfs_node, num_dfs = search.depth_first_graph_search(problem)
+            bbs_node, num_bbs = search.branch_and_bound_graph_search(problem)
+            bbes_node, num_bbes = search.branch_and_bound_with_underestimation_graph_search(problem)
+
+            # bfs_node_path = bfs_node.path()
+            # dfs_node_path = dfs_node.path()
+            bbs_node_path = bbs_node.path()
+            bbes_node_path = bbes_node.path()
+
+            # print('BFS: ', bfs_node_path, ', cost = ', bfs_node.path_cost, ', expanded_nodes = ', num_bfs, sep='')
+            # print('DFS: ', dfs_node_path, ', cost = ', dfs_node.path_cost, ', expanded_nodes = ', num_dfs, sep='')
+            print('BBS: ', bbs_node_path, ', cost = ', bbs_node.path_cost, ', expanded_nodes = ', num_bbs, sep='')
+            print('BBES: ', bbes_node_path, ', cost = ', bbes_node.path_cost, ', expanded_nodes = ', num_bbes, sep='')
+
+            writer.writerow([str(num_bbs), str(num_bbes)])

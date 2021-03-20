@@ -1,5 +1,22 @@
+"""
+Simple Data Structures and Other Utilities
+=============================================================================
 
-#______________________________________________________________________________
+These are some useful utilities that are used in search.py to implement
+graphs and graphs search. You can use it as a manner to simplify your
+code or when you want to reproduce a data structure not found at Python
+"""
+import copy
+import inspect
+import math
+import operator
+import os
+import random
+import sys
+
+from functools import reduce
+
+# ______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
 
 infinity = 1.0e400
@@ -17,6 +34,7 @@ class DefaultDict(dict):
     """Dictionary with a default value for unknown keys."""
 
     def __init__(self, default):
+        super().__init__()
         self.default = default
 
     def __getitem__(self, key):
@@ -24,9 +42,9 @@ class DefaultDict(dict):
         return self.setdefault(key, copy.deepcopy(self.default))
 
     def __copy__(self):
-        copy = DefaultDict(self.default)
-        copy.update(self)
-        return copy
+        val_copy = DefaultDict(self.default)
+        val_copy.update(self)
+        return val_copy
 
 
 class Struct:
@@ -58,13 +76,15 @@ def update(x, **entries):
         x.update(entries)
     else:
         x.__dict__.update(entries)
+
     return x
 
 
-#______________________________________________________________________________
+# ______________________________________________________________________________
 # Functions on Sequences (mostly inspired by Common Lisp)
+#
 # NOTE: Sequence functions (count_if, find_if, every, some) take function
-# argument first (like reduce, filter, and map).
+#       argument first (like reduce, filter, and map).
 
 def removeall(item, seq):
     """Return a copy of seq (or string) with all occurences of item removed.
@@ -112,6 +132,7 @@ def find_if(predicate, seq):
     """
     for x in seq:
         if predicate(x): return x
+
     return None
 
 
@@ -124,6 +145,7 @@ def every(predicate, seq):
     """
     for x in seq:
         if not predicate(x): return False
+
     return True
 
 
@@ -137,6 +159,7 @@ def some(predicate, seq):
     for x in seq:
         px = predicate(x)
         if px: return px
+
     return False
 
 
@@ -149,16 +172,18 @@ def isin(elt, seq):
     """
     for x in seq:
         if elt is x: return True
+
     return False
 
 
-#______________________________________________________________________________
+# ______________________________________________________________________________
 # Functions on sequences of numbers
-# NOTE: these take the sequence argument first, like min and max,
-# and like standard math notation: \sigma (i = 1..n) fn(i)
-# A lot of programing is finding the best value that satisfies some condition;
-# so there are three versions of argmin/argmax, depending on what you want to
-# do with ties: return the first one, return them all, or pick at random.
+
+# NOTE: these take the sequence argument first, like min and max, and like
+#       standard math notation: \sigma (i = 1..n) fn(i). A lot of programing
+#       is finding the best value that satisfies some condition; so there are
+#       three versions of argmin/argmax, depending on what you want to do with
+#       ties: return the first one, return them all, or pick at random.
 
 
 def argmin(seq, fn):
@@ -166,12 +191,15 @@ def argmin(seq, fn):
     >>> argmin(['one', 'to', 'three'], len)
     'to'
     """
-    best = seq[0];
+    best = seq[0]
     best_score = fn(best)
+
     for x in seq:
         x_score = fn(x)
+
         if x_score < best_score:
             best, best_score = x, x_score
+
     return best
 
 
@@ -181,29 +209,36 @@ def argmin_list(seq, fn):
     ['to', 'or']
     """
     best_score, best = fn(seq[0]), []
+
     for x in seq:
         x_score = fn(x)
+
         if x_score < best_score:
             best, best_score = [x], x_score
         elif x_score == best_score:
             best.append(x)
+
     return best
 
 
 def argmin_random_tie(seq, fn):
     """Return an element with lowest fn(seq[i]) score; break ties at random.
     Thus, for all s,f: argmin_random_tie(s, f) in argmin_list(s, f)"""
-    best_score = fn(seq[0]);
-    n = 0
+    best_score, n = fn(seq[0]), 0
+
     for x in seq:
         x_score = fn(x)
+
         if x_score < best_score:
-            best, best_score = x, x_score;
+            best, best_score = x, x_score
             n = 1
+
         elif x_score == best_score:
-            n += 1
+            n = n + 1
+
             if random.randrange(n) == 0:
                 best = x
+
     return best
 
 
@@ -224,22 +259,24 @@ def argmax_list(seq, fn):
 
 
 def argmax_random_tie(seq, fn):
-    "Return an element with highest fn(seq[i]) score; break ties at random."
+    """Return an element with highest fn(seq[i]) score; break ties at random."""
     return argmin_random_tie(seq, lambda x: -fn(x))
 
 
-#______________________________________________________________________________
+# ______________________________________________________________________________
 # Statistical and mathematical functions
 
-def histogram(values, mode=0, bin_function=None):
+def histogram(values, val_mode=0, bin_function=None):
     """Return a list of (value, count) pairs, summarizing the input values.
     Sorted by increasing value, or if mode=1, by decreasing count.
     If bin_function is given, map it over values first."""
     if bin_function: values = list(map(bin_function, values))
     bins = {}
+
     for val in values:
         bins[val] = bins.get(val, 0) + 1
-    if mode:
+
+    if val_mode:
         return sorted(list(bins.items()), key=lambda v: v[1], reverse=True)
     else:
         return sorted(bins.items())
@@ -258,7 +295,7 @@ def mode(values):
     >>> mode([1, 2, 3, 2])
     2
     """
-    return histogram(values, mode=1)[0][0]
+    return histogram(values, val_mode=1)[0][0]
 
 
 def median(values):
@@ -270,12 +307,13 @@ def median(values):
     >>> median([1, 2, 3, 4])
     2.5
     """
-    n = len(values)
-    values = sorted(values)
+    n, values = len(values), sorted(values)
+
     if n % 2 == 1:
-        return values[n / 2]
+        return values[n // 2]
     else:
         middle2 = values[(n / 2) - 1:(n / 2) + 1]
+
         try:
             return mean(middle2)
         except TypeError:
@@ -290,7 +328,7 @@ def mean(values):
 def stddev(values, meanval=None):
     """The standard deviation of a set of values.
     Pass in the mean if you already know it."""
-    if meanval == None: meanval = mean(values)
+    if meanval is None: meanval = mean(values)
     return math.sqrt(sum([(x - meanval) ** 2 for x in values]) / (len(values) - 1))
 
 
@@ -311,7 +349,7 @@ def vector_add(a, b):
 
 
 def probability(p):
-    "Return true with probability p."
+    """Return true with probability p."""
     return p > random.uniform(0.0, 1.0)
 
 
@@ -323,6 +361,7 @@ def num_or_str(x):
     '42x'
     """
     if isnumber(x): return x
+
     try:
         return int(x)
     except ValueError:
@@ -340,9 +379,10 @@ def normalize(numbers, total=1.0):
     k = total / sum(numbers)
     return [k * n for n in numbers]
 
-## OK, the following are not as widely useful utilities as some of the other
-## functions here, but they do show up wherever we have 2D grids: Wumpus and
-## Vacuum worlds, TicTacToe and Checkers, and markov decision Processes.
+
+# OK, the following are not as widely useful utilities as some of the other
+# functions here, but they do show up wherever we have 2D grids: Wumpus and
+# Vacuum worlds, TicTacToe and Checkers, and markov decision Processes.
 
 orientations = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 
@@ -356,14 +396,14 @@ def turn_left(orientation):
 
 
 def distance(xxx_todo_changeme, xxx_todo_changeme1):
-    "The distance between two (x, y) points."
+    """The distance between two (x, y) points."""
     (ax, ay) = xxx_todo_changeme
     (bx, by) = xxx_todo_changeme1
     return math.hypot((ax - bx), (ay - by))
 
 
 def distance2(xxx_todo_changeme2, xxx_todo_changeme3):
-    "The square of the distance between two (x, y) points."
+    """The square of the distance between two (x, y) points."""
     (ax, ay) = xxx_todo_changeme2
     (bx, by) = xxx_todo_changeme3
     return (ax - bx) ** 2 + (ay - by) ** 2
@@ -379,14 +419,14 @@ def clip(vector, lowest, highest):
     return type(vector)(list(map(min, list(map(max, vector, lowest)), highest)))
 
 
-#______________________________________________________________________________
+# ______________________________________________________________________________
 # Misc Functions
 
-def printf(format, *args):
+def printf(format_val, *args):
     """Format args with the first argument as format string, and write.
     Return the last arg, or format itself if there are no args."""
-    sys.stdout.write(str(format) % args)
-    return if_(args, args[-1], format)
+    sys.stdout.write(str(format_val) % args)
+    return if_(args, args[-1], format_val)
 
 
 def caller(n=1):
@@ -398,8 +438,6 @@ def caller(n=1):
     >>> f()
     'f'
     """
-    import inspect
-
     return inspect.getouterframes(inspect.currentframe())[n][3]
 
 
@@ -419,9 +457,11 @@ def memoize(fn, slot=None):
         def memoized_fn(*args):
             if args not in memoized_fn.cache:
                 memoized_fn.cache[args] = fn(*args)
+
             return memoized_fn.cache[args]
 
         memoized_fn.cache = {}
+
     return memoized_fn
 
 
@@ -441,20 +481,20 @@ def if_(test, result, alternative):
         return alternative
 
 
-def name(object):
-    "Try to find some reasonable name for the object."
-    return (getattr(object, 'name', 0) or getattr(object, '__name__', 0)
-            or getattr(getattr(object, '__class__', 0), '__name__', 0)
-            or str(object))
+def name(object_val):
+    """Try to find some reasonable name for the object."""
+    return (getattr(object_val, 'name', 0) or getattr(object_val, '__name__', 0)
+            or getattr(getattr(object_val, '__class__', 0), '__name__', 0)
+            or str(object_val))
 
 
 def isnumber(x):
-    "Is x a number? We say it is if it has a __int__ method."
+    """Is x a number? We say it is if it has a __int__ method."""
     return hasattr(x, '__int__')
 
 
 def issequence(x):
-    "Is x a sequence? We say it is if it has a __getitem__ method."
+    """Is x a sequence? We say it is if it has a __getitem__ method."""
     return hasattr(x, '__getitem__')
 
 
@@ -465,32 +505,35 @@ def print_table(table, header=None, sep=' ', numfmt='%g'):
     (If you want different formats in differnt columns, don't use print_table.)
     sep is the separator between columns."""
     justs = [if_(isnumber(x), 'rjust', 'ljust') for x in table[0]]
-    if header:
-        table = [header] + table
-    table = [[if_(isnumber(x), lambda: numfmt % x, x) for x in row]
-             for row in table]
-    maxlen = lambda seq: max(list(map(len, seq)))
-    sizes = list(map(maxlen, list(zip(*[list(map(str, row)) for row in table]))))
+
+    if header: table = [header] + table
+
+    table = [[if_(isnumber(x), lambda: numfmt % x, x) for x in row] for row in table]
+
+    max_len = lambda seq: max(list(map(len, seq)))
+    sizes = list(map(max_len, list(zip(*[list(map(str, row)) for row in table]))))
+
     for row in table:
         for (j, size, x) in zip(justs, sizes, row):
             print(getattr(str(x), j)(size), sep, end=' ')
+
         print()
 
 
-def AIMAFile(components, mode='r'):
-    "Open a file based at the AIMA root directory."
+def AIMAFile(components, val_mode='r'):
+    """Open a file based at the AIMA root directory."""
     import utils
 
-    dir = os.path.dirname(utils.__file__)
-    return open(os.path.join(*[dir] + components), mode)
+    dirname = os.path.dirname(utils.__file__)
+    return open(os.path.join(*[dirname] + components), val_mode)
 
 
-def DataFile(name, mode='r'):
-    "Return a file in the AIMA /data directory."
-    return AIMAFile(['..', 'data', name], mode)
+def DataFile(val_name, val_mode='r'):
+    """Return a file in the AIMA /data directory."""
+    return AIMAFile(['..', 'data', val_name], val_mode)
 
 
-#______________________________________________________________________________
+# ______________________________________________________________________________
 # Queues: Stack, FIFOQueue
 
 class Queue:
@@ -538,12 +581,14 @@ class FIFOQueue(Queue):
     def pop(self):
         e = self.A[self.start]
         self.start += 1
+
         if self.start > 5 and self.start > len(self.A) / 2:
             self.A = self.A[self.start:]
             self.start = 0
+
         return e
 
-class BranchAndBoundList:
+class BranchAndBoundList(object):
 
     def __init__(self):
         self.list = []
@@ -557,11 +602,27 @@ class BranchAndBoundList:
         self.list.sort(key=lambda node: node.cost_path(), reverse=True)
 
     def pop(self):
-        self.list.pop()
+        return self.list.pop()
 
-## Fig: The idea is we can define things like Fig[3,10] later.
-## Alas, it is Fig[3,10] not Fig[3.10], because that would be the same as Fig[3.1]
+
+class BranchAndBoundWithUnderestimationList(object):
+
+    def __init__(self, problem):
+        self.list = []
+        self.problem = problem
+
+    def append(self, item):
+        self.list.append(item)
+        self.list.sort(key=lambda node: node.cost_path() + self.problem.h(node), reverse=True)
+
+    def extend(self, items):
+        self.list.extend(items)
+        self.list.sort(key=lambda node: node.cost_path() + self.problem.h(node), reverse=True)
+
+    def pop(self):
+        return self.list.pop()
+
+
+# Fig: The idea is we can define things like Fig[3,10] later.
+# Alas, it is Fig[3,10] not Fig[3.10], because that would be the same as Fig[3.1]
 Fig = {}
-
-
-
