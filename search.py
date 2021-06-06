@@ -73,12 +73,21 @@ class Node:
     def __repr__(self):
         return "<Node %s>" % (self.state,)
 
+    def __str__(self):
+        return "<Node %s>" % (self.state,)
+
+    def __eq__(self, other):
+        return self.__repr__() == other.__repr__()
+
     def path(self):
         """Create a list of nodes from the root to this node."""
         x, result = self, [self]
+
         while x.parent:
             result.append(x.parent)
             x = x.parent
+
+        result.reverse()
         return result
 
     def cost_path(self):

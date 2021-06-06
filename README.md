@@ -24,13 +24,13 @@ nodes obtained by the branch and bound with underestimation are the smallest. Th
 an informed graph search while the other one does not know any information about destination.
 <br>
 
-BB Search | BBE Search
-------|-------
-28 | 23
-20 | 18
-36 | 30
-9 | 4
-28 | 21
+| Start | Objective | Result | Branch and Bound | Branch and Bound with Sub-Estimation |
+| ----- | --------- | ------ | ---------------- | ------------------------------------ |
+| A | B | A S F B   | 28 | 23 |
+| L | P | L M D C P | 20 | 18 |
+| R | H | R P B U H | 36 | 30 |
+| S | A | S A       | 9  | 4  |
+| C | G | G C       | 28 | 21 | 
 
 ## Authors
 
