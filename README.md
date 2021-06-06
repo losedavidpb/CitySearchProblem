@@ -30,7 +30,7 @@ an informed graph search while the other one does not know any information about
 | L | P | L M D C P | 20 | 18 |
 | R | H | R P B U H | 36 | 30 |
 | S | A | S A       | 9  | 4  |
-| C | G | G C       | 28 | 21 | 
+| C | G | G P B G   | 28 | 21 | 
 
 ## Authors
 
