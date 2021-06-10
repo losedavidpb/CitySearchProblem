@@ -15,7 +15,7 @@ if __name__ == '__main__':
     with open('bbs_bbes.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['BBS vs BBES'])
-        writer.writerow(['Start', 'Objective', 'Result', 'BBS', 'BBES'])
+        writer.writerow(['Start', 'Objective', 'Result', 'Visited BBS', 'Visited BBES', 'Expanded BBS', 'Expanded BBES'])
 
         for way_case in ways:
             orig_node, goal_node = way_case
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
             if bbs_node_path == bbes_node_path:
                 way = [str(node)[-2] for node in bbs_node_path]
-                writer.writerow([orig_node, goal_node, way, str(num_bbs), str(num_bbes)])
+                writer.writerow([orig_node, goal_node, way, str(vnum_bbs), str(vnum_bbes), str(num_bbs), str(num_bbes)])
             else:
                 print("error: resulted path must be the same for BBS and BBES")
                 exit(1)

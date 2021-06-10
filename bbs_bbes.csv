@@ -1,0 +1,7 @@
+BBS vs BBES
+Start,Objective,Result,Visited BBS,Visited BBES,Expanded BBS,Expanded BBES
+A,B,"['A', 'S', 'F', 'B']",12,10,28,23
+L,P,"['L', 'M', 'D', 'C', 'P']",9,8,20,18
+R,H,"['R', 'P', 'B', 'U', 'H']",15,12,36,30
+S,A,"['S', 'A']",4,2,9,4
+C,G,"['C', 'P', 'B', 'G']",11,8,28,21
