@@ -115,22 +115,25 @@ def graph_search(problem, fringe):
     The argument fringe should be an empty queue.
     If two paths reach a state, only use the best one. [Fig. 3.18]"""
     closed, count_expanded_nodes = {}, 0
+    count_visited_nodes = 0
+
     fringe.append(Node(problem.initial))
 
     while fringe:
         node = fringe.pop()
 
         if problem.goal_test(node.state):
-            return node, count_expanded_nodes
+            return node, count_visited_nodes + 1, count_expanded_nodes
 
         if node.state not in closed:
+            count_visited_nodes += 1
             closed[node.state] = True
             expanded_nodes = node.expand(problem)
             count_expanded_nodes += len(expanded_nodes)
 
             fringe.extend(expanded_nodes)
 
-    return None, count_expanded_nodes
+    return None, count_visited_nodes, count_expanded_nodes
 
 
 def breadth_first_graph_search(problem):
@@ -244,7 +247,6 @@ def RandomGraph(nodes=list(range(10)), min_links=2, width=400, height=300,
 
 # ______________________________________________________________________________
 # Examples of instances for graphs problems
-
 
 romania = UndirectedGraph(
     Dict(

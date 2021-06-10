@@ -1,7 +1,0 @@
-BBS vs BBES
-Start,Objective,Result,BBS,BBES
-A,B,"['A', 'S', 'F', 'B']",28,23
-L,P,"['L', 'M', 'D', 'C', 'P']",20,18
-R,H,"['R', 'P', 'B', 'U', 'H']",36,30
-S,A,"['S', 'A']",9,4
-C,G,"['C', 'P', 'B', 'G']",28,21

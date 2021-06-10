@@ -25,8 +25,8 @@ if __name__ == '__main__':
 
             # bfs_node, num_bfs = search.breadth_first_graph_search(problem)
             # dfs_node, num_dfs = search.depth_first_graph_search(problem)
-            bbs_node, num_bbs = search.branch_and_bound_graph_search(problem)
-            bbes_node, num_bbes = search.branch_and_bound_with_underestimation_graph_search(problem)
+            bbs_node, vnum_bbs, num_bbs = search.branch_and_bound_graph_search(problem)
+            bbes_node, vnum_bbes, num_bbes = search.branch_and_bound_with_underestimation_graph_search(problem)
 
             # bfs_node_path = bfs_node.path()
             # dfs_node_path = dfs_node.path()
@@ -35,8 +35,8 @@ if __name__ == '__main__':
 
             # print('BFS: ', bfs_node_path, ', cost = ', bfs_node.path_cost, ', expanded_nodes = ', num_bfs, sep='')
             # print('DFS: ', dfs_node_path, ', cost = ', dfs_node.path_cost, ', expanded_nodes = ', num_dfs, sep='')
-            print('BBS: ', bbs_node_path, ', cost = ', bbs_node.path_cost, ', expanded_nodes = ', num_bbs, sep='')
-            print('BBES: ', bbes_node_path, ', cost = ', bbes_node.path_cost, ', expanded_nodes = ', num_bbes, sep='')
+            print('BBS: ', bbs_node_path, ', cost = ', bbs_node.path_cost, ', expanded_nodes = ', num_bbs, ', visited_nodes = ', vnum_bbs, sep='')
+            print('BBES: ', bbes_node_path, ', cost = ', bbes_node.path_cost, ', expanded_nodes = ', num_bbes, ', visited_nodes = ', vnum_bbes,  sep='')
 
             if bbs_node_path == bbes_node_path:
                 way = [str(node)[-2] for node in bbs_node_path]
