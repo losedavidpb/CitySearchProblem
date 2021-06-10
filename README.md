@@ -16,7 +16,7 @@ how many nodes have been expanded during the search.
 - Branch and bound graph search (BBS)
 - Branch and bound with subestimation graph search (BBES)
 
-## Comparison of expanded nodes between BBS and BBES
+## Comparison of visited and expanded nodes between BBS and BBES
 
 In this comparative table you can see the number of expanded nodes obtained using the BBS and BBES techniques.
 Therefore, we can say that the paths chosen by both search algorithms are the same, except that the number of expanded
@@ -24,13 +24,13 @@ nodes obtained by the branch and bound with underestimation are the smallest. Th
 an informed graph search while the other one does not know any information about destination.
 <br>
 
-| Start | Objective | Result | Branch and Bound | Branch and Bound with Sub-Estimation |
-| ----- | --------- | ------ | ---------------- | ------------------------------------ |
-| A | B | A S F B   | 28 | 23 |
-| L | P | L M D C P | 20 | 18 |
-| R | H | R P B U H | 36 | 30 |
-| S | A | S A       | 9  | 4  |
-| C | G | G P B G   | 28 | 21 | 
+| Start | Objective | Result | Visited Nodes BBS | Visited Nodes BBES | Expanded Nodes BBS | Expanded Nodes BBES |
+| ----- | --------- | ------ | ----------------- | ------------------ | ------------------ | ------------------- |
+| A | B | A S F B   | 12 | 10 | 28 | 23 |
+| L | P | L M D C P | 9 | 8 | 20 | 18 |
+| R | H | R P B U H | 15 | 12 | 36 | 30 |
+| S | A | S A       | 4 | 2 | 9 | 4 |
+| C | G | G P B G   | 11 | 8 | 28 | 21 | 
 
 ## Authors
 
